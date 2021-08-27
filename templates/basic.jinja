@@ -34,11 +34,13 @@
 
         document.getElementById("update_button").addEventListener('click', async ev => {
             ev.preventDefault()
+            newValue = document.getElementById("new_amount").value
             newJWT = await postData("http://localhost:3000/updatejwt", {
                 "jwt": config.jwt, 
-                "new_amount": document.getElementById("new_amount").value
+                "new_amount": newValue
             })
             st.updateJWT(newJWT.jwt)
+            document.getElementById("baseamount_value").innerHTML = newValue*100
         })
     </script>
 {% endblock %}

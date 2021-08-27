@@ -62,6 +62,7 @@
             key.innerHTML = `${k}: `
             let value = document.createElement("SPAN")
             value.innerHTML = v
+            value.id = `${k}_value`
             row.appendChild(key)
             row.appendChild(value)
             payload.appendChild(row)
