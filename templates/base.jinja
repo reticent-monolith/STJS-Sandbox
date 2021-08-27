@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet">
+    <link href="{{url_for('static', filename='css/app.css')}}" rel="stylesheet">
+    {# Jinja variables #}
+    <meta id="vars" 
+        data-jwt="{{jwt}}" 
+        data-creds="{{creds}}"
+        data-pan="{{pan}}"
+        data-type="{{type}}" 
+        data-decoded="{{decoded_jwt}}"
+    >
+    <title>STJS {% block title %}{% endblock %}</title>
+</head>
+<body>
+
+    {# Create JS variables from jinja variables #}
+    <script>
+        const jwt = document.getElementById("vars").dataset.jwt
+        const creds = document.getElementById("vars").dataset.creds
+        const pan = document.getElementById("vars").dataset.pan
+        const type = document.getElementById("vars").dataset.type
+        const decoded = JSON.parse(document.getElementById("vars").dataset.decoded.replaceAll('\'', '"'))
+    </script>
+
+    {# Build nav menu #}
+    <div id="menu" class="center">
+        <a href="{{url_for('basic')}}">Basic Setup</a>
+        <a href="{{url_for('subscription')}}">Subscription</a>
+        <a href="{{url_for('tokenise')}}">Tokenise with js</a>
+    </div>
+
+    {# Build JWT preview #}
+    <div id="jwt_box" class="center box">
+        <div class="row">
+            <div id="payload"></div>
+        </div><br>
+        <div class="row">
+            <span id="iat"></span>
+        </div>
+        <div class="row">
+            <span id="iss"></span>
+        </div>
+    </div>
+    <script>
+        const box = document.getElementById("jwt_box")
+        const timestamp = document.getElementById("iat")
+        const jwtUser = document.getElementById("iss")
+        const payload = document.getElementById("payload")
+        timestamp.innerHTML = `${decoded.iat}`
+        jwtUser.innerHTML = `${decoded.iss}`
+        for (let [k,v] of Object.entries(decoded.payload)) {
+            let row = document.createElement("DIV")
+            let key = document.createElement("SPAN")
+            key.classList.add("key")
+            key.innerHTML = `${k}: `
+            let value = document.createElement("SPAN")
+            value.innerHTML = v
+            row.appendChild(key)
+            row.appendChild(value)
+            payload.appendChild(row)
+        }
+    </script>
+
+    {# The actual stjs form #}
+    <div id="content" class="center">
+        {% block form %}{% endblock %}
+    </div>
+
+    {# Bring in the stjs #}
+    <script src=https://{{domain}}/js/v{{version}}/st.js></script>
+
+    {# Some helper and callback functions #}
+    <script>
+        async function postData(url = '', data = {}) {
+            // Default options are marked with *
+            const response = await fetch(url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                    'Content-Type': 'application/json'
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: JSON.stringify(data) // body data type must match "Content-Type" header
+            });
+            return response.json(); // parses JSON response into native JavaScript objects
+        }
+        async function success() {
+            console.log("CALLING SUCCESS")
+            console.log(await postData("http://localhost:3000/success", {success: "yes"}))
+        }
+        async function error(err) {
+            console.log("CALLING ERROR")
+            console.log(err)
+            console.log(await postData("http://localhost:3000/error", {success: "no..."}))
+        }
+        async function submit(obj) {
+            console.log("CALLING SUBMIT")
+            console.log(obj)
+            console.log("POSTING obj TO BACKEND")
+            console.log(await postData("http://localhost:3000/submit", obj))
+        }
+        async function tokenise(obj) {
+            console.log("CALLING TOKENISE")
+            console.log(obj)
+            console.log("POSTING TO /save_transactionreference")
+            console.log(await postData("http://localhost:3000/save_transactionreference", obj))
+        }
+    </script>
+
+    {# Create the stjs config object #}
+    {% block config %}{% endblock %}
+
+    {# Call the stjs #}
+    {% block stjs %}{% endblock %}
+
+    {# Show test cards for easy use #}
+    <div id="test-cards" class="center">
+        <ul>
+            <li>
+                <p>Successful Visa v2.1.0:</p><p>4000 0000 0000 1000</p>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>

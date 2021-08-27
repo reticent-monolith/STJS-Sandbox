@@ -1,0 +1,44 @@
+a {
+    background: lightseagreen;
+    border-radius: 10px;
+    color: whitesmoke;
+    padding: 5px;
+    margin: 5px;
+    text-decoration: none;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.center {
+    margin: 0 auto;
+}
+
+#menu {
+    padding: 10px;
+}
+
+
+#content {
+    color: blue
+}
+
+#test-cards {
+    color: blue
+}
+
+.box {
+    display: flex;
+    flex-direction: column;
+}
+
+.box .row {
+    display: flex;
+}
+
+.key {
+    color: lightseagreen
+}

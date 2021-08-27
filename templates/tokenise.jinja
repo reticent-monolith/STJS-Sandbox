@@ -1,0 +1,29 @@
+{% extends 'base.jinja' %}
+{% block title %}Tokenise{% endblock %}
+
+{% block form %}
+    <div id="st-notification-frame"></div>
+    <form id="st-form" action="{{url_for('end', page='tokenise')}}" method="POST">
+        <div id="st-card-number"></div>
+        <div id="st-expiration-date"></div>
+        <div id="st-security-code"></div>
+        <button type="submit"></button>
+        <div id="st-apple-pay"></div>
+    </form>
+{% endblock %}
+{% block stjs %}
+    <script>
+        (function () {
+            var st = SecureTrading({
+
+                jwt: jwt,
+                submitOnError: false,
+                successCallback: success,
+                submitCallback: tokenise
+            });
+            st.Components({
+                startOnLoad: false,
+            });
+        })();
+    </script>
+{% endblock %}

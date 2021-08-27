@@ -1,0 +1,53 @@
+{% extends 'base.jinja' %}
+
+{% block title %}Basic{% endblock %}
+
+{% block form %}
+    <div id="st-notification-frame"></div>
+    <form id="st-form" action="{{url_for('end', page='basic')}}" method="POST">
+        <div id="st-card-number"></div>
+        <div id="st-expiration-date"></div>
+        {% if pan != "" %}
+        <p>Saved card: {{pan}} {{type}}</p>
+        {% endif %}
+        <div id="st-security-code"></div>
+        <button type="submit"></button>
+        <div id="st-apple-pay"></div>
+    </form>
+
+    <input id="new_amount" type="number" />
+    <button id="update_button">Update</button>
+{% endblock %}
+
+{% block config %}
+    <script>
+        config = {
+            jwt: jwt,
+            submitOnError: false,
+            successCallback: success,
+            submitCallback: submit
+        }
+        if (creds === "1") {
+            config.fieldsToSubmit = ['securitycode']
+        }
+        var st = SecureTrading(config);
+
+        document.getElementById("update_button").addEventListener('click', async ev => {
+            ev.preventDefault()
+            newJWT = await postData("http://localhost:3000/updatejwt", {
+                "jwt": config.jwt, 
+                "new_amount": document.getElementById("new_amount").value
+            })
+            st.updateJWT(newJWT.jwt)
+        })
+    </script>
+{% endblock %}
+
+{% block stjs %}
+    <script>
+        console.log(st)
+        st.Components({
+            startOnLoad: false,
+        });
+    </script>
+{% endblock %}
