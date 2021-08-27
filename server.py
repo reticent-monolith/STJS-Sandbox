@@ -108,7 +108,7 @@ def end(page):
 def submit():
     post_data = request.get_json()
     try:
-        obj_jwt = pjwt.decode(post_data['jwt'], SECRET, algorithms=["HS256"], audience="ben_jsapi")
+        obj_jwt = pjwt.decode(post_data['jwt'], SECRET, algorithms=["HS256"], audience=JWT_USER)
         print(obj_jwt)
         return make_response(jsonify({"jwt": obj_jwt}), 200)
     except KeyError as ke:
@@ -145,7 +145,7 @@ def update_jwt():
     req = request.get_json()
     jwt = pjwt.decode(req["jwt"], SECRET, algorithms=["HS256"])
     amount = req["new_amount"]
-    jwt["payload"]["baseamount"] = int(amount)*100
+    jwt["payload"]["baseamount"] = float(amount)*100
     return make_response(jsonify({"jwt": pjwt.encode(jwt, SECRET, algorithm="HS256")}), 200)
 
 # DRIVER CODE
