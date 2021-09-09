@@ -1,0 +1,47 @@
+{% extends 'base.jinja' %}
+
+{% block title %}PPG{% endblock %}
+
+{% block form %}
+    <div>
+        <h3>Add a new field</h3>
+        <input id="new_name" name="new_field_name" placeholder="New field name">
+        <input id="new_val" name="new_field_value" placeholder="New field value">
+        <button id="add_btn">Add</button>
+    </div>
+
+    <h3>POST Form</h3>
+    <form id="ppg_form" method="POST" action="https://{{domain}}/process/payments/choice">
+        <span>sitereference</span>
+        <input name="sitereference" value="{{site_ref}}"><br>
+        <span>stprofile</span>
+        <input name="stprofile" value="default"><br>
+        <span>currencyiso3a</span>
+        <input name="currencyiso3a" value="GBP"><br>
+        <span>mainamount</span>
+        <input name="mainamount" value="100.00"><br>
+        <span>version</span>
+        <input name="version" value="2"><br>
+        <input id="submitbutton" type="submit" value="Pay">
+    </form>
+
+    <script>
+        var button = document.getElementById("add_btn")
+        var name_input = document.getElementById("new_name")
+        var value_input = document.getElementById("new_val")
+        var form = document.getElementById("ppg_form")
+        button.addEventListener('click', () => {
+            var label = document.createElement("span")
+            label.innerHTML = name_input.value
+            var new_field = document.createElement("input")
+            console.log(value_input.value)
+            new_field.name = name_input.value
+            new_field.value = value_input.value
+            form.insertBefore(label, document.getElementById("submitbutton"))
+            form.insertBefore(new_field, document.getElementById("submitbutton"))
+            form.insertBefore(document.createElement("br"), document.getElementById("submitbutton"))
+            name_input.value = ""
+            value_input.value = ""
+        })
+    </script>
+{% endblock %}

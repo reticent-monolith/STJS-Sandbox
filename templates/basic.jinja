@@ -16,7 +16,7 @@
     </form>
 
     <input id="new_amount" type="number" />
-    <button id="update_button">Update</button>
+    <button id="update_button" placeholder="baseamount">Update</button>
 {% endblock %}
 
 {% block config %}
@@ -25,7 +25,8 @@
             jwt: jwt,
             submitOnError: false,
             successCallback: success,
-            submitCallback: submit
+            submitCallback: submit,
+            livestatus: 1,
         }
         if (creds === "1") {
             config.fieldsToSubmit = ['securitycode']

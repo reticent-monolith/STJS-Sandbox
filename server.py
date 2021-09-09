@@ -13,7 +13,8 @@ load_dotenv()
 SITE_REF = os.environ["SITE_REF"]
 JWT_USER = os.environ["JWT_USER"]
 SECRET = os.environ["SECRET"]
-DOMAIN = os.environ["DOMAIN"]
+P_DOMAIN = os.environ["P_DOMAIN"]
+W_DOMAIN = os.environ["W_DOMAIN"]
 VERSION = os.environ["VERSION"]
 
 def get_refs(file):
@@ -62,7 +63,7 @@ def basic():
         type = transaction_refs[len(transaction_refs)-1]["paymenttypedescription"]
 
     my_jwt = pjwt.encode(jwt, SECRET, algorithm="HS256")
-    return render_template("basic.jinja", jwt=my_jwt, decoded_jwt=jwt, domain=DOMAIN, version=VERSION, creds=has_saved_creds, pan=pan, type=type)
+    return render_template("basic.jinja", jwt=my_jwt, decoded_jwt=jwt, domain=W_DOMAIN, version=VERSION, creds=has_saved_creds, pan=pan, type=type)
 
 # SUBSCRIPTION
 @app.route("/subscription")
@@ -83,7 +84,7 @@ def subscription():
         "iat": time.mktime(datetime.datetime.now().timetuple()),
     }
     my_jwt = pjwt.encode(jwt, SECRET, algorithm="HS256")
-    return render_template("subscription.jinja", jwt=my_jwt, decoded_jwt=jwt, domain=DOMAIN, version=VERSION)
+    return render_template("subscription.jinja", jwt=my_jwt, decoded_jwt=jwt, domain=W_DOMAIN, version=VERSION)
 
 # TOKENISE
 @app.route("/tokenise")
@@ -98,7 +99,7 @@ def tokenise():
         "iat": time.mktime(datetime.datetime.now().timetuple()),
     }
     my_jwt = pjwt.encode(jwt, SECRET, algorithm="HS256")
-    return render_template("tokenise.jinja", jwt=my_jwt, decoded_jwt=jwt, domain=DOMAIN, version=VERSION)
+    return render_template("tokenise.jinja", jwt=my_jwt, decoded_jwt=jwt, domain=W_DOMAIN, version=VERSION)
 
 @app.route("/end?from=<page>", methods=["POST"])
 def end(page):
@@ -148,6 +149,12 @@ def update_jwt():
     jwt["payload"]["baseamount"] = float(amount)*100
     return make_response(jsonify({"jwt": pjwt.encode(jwt, SECRET, algorithm="HS256")}), 200)
 
+
+# Payment pages
+@app.route("/ppg")
+def ppg():
+    return render_template(f"ppg.jinja", domain=P_DOMAIN, site_ref=SITE_REF)
+
 # DRIVER CODE
 if __name__=="__main__":
-    app.run(host="localhost", port=3000, load_dotenv=True)
+    app.run(host="localhost", port=3000, load_dotenv=True, debug=True)
