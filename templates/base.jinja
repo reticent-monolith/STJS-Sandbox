@@ -70,15 +70,6 @@
         }
     </script>
 
-    {# The actual stjs form #}
-    <div id="content" class="center">
-        {% block form %}{% endblock %}
-    </div>
-
-    {# Bring in the stjs #}
-    <script src=https://{{domain}}/js/v{{version}}/st.js></script>
-
-    {# Some helper and callback functions #}
     <script>
         async function postData(url = '', data = {}) {
             // Default options are marked with *
@@ -97,6 +88,19 @@
             });
             return response.json(); // parses JSON response into native JavaScript objects
         }
+    </script>
+
+    {# The actual stjs form #}
+    <div id="content" class="center">
+        {% block form %}{% endblock %}
+    </div>
+
+    {# Bring in the stjs #}
+    <script src=https://{{domain}}/js/v{{version}}/st.js></script>
+
+    {# Some helper and callback functions #}
+    <script>
+        
         async function success() {
             console.log("CALLING SUCCESS")
             console.log(await postData("http://localhost:3000/success", {success: "yes"}))
@@ -130,6 +134,7 @@
     <div id="test-cards" class="center">
         <ul>
             <li>
+                <p>Standard ACS Popup:</p><p>4111 1111 1111 1111</p>
                 <p>Successful Visa v2.1.0:</p><p>4000 0000 0000 1000</p>
             </li>
         </ul>

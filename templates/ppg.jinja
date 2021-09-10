@@ -1,13 +1,34 @@
-{% extends 'base.jinja' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet">
+    <link href="{{url_for('static', filename='css/app.css')}}" rel="stylesheet">
+    {# Jinja variables #}
+    <meta id="vars" 
+        data-fields="{{fields}}" 
+    >
+    <title>PPG</title>
+</head>
+<body>
+    <div id="menu" class="center">
+        <a href="{{url_for('basic')}}">Basic Setup</a>
+        <a href="{{url_for('subscription')}}">Subscription</a>
+        <a href="{{url_for('tokenise')}}">Tokenise with js</a>
+        <a href="{{url_for('ppg')}}">PPG</a>
+    </div>
 
-{% block title %}PPG{% endblock %}
-
-{% block form %}
     <div>
         <h3>Add a new field</h3>
         <input id="new_name" name="new_field_name" placeholder="New field name">
         <input id="new_val" name="new_field_value" placeholder="New field value">
         <button id="add_btn">Add</button>
+        <button id="save_btn">Save</button>
+        <button id="clr_btn">Clear</button>
     </div>
 
     <h3>POST Form</h3>
@@ -24,24 +45,77 @@
         <input name="version" value="2"><br>
         <input id="submitbutton" type="submit" value="Pay">
     </form>
-
+    {# Show test cards for easy use #}
+    <div id="test-cards" class="center">
+        <ul>
+            <li>
+                <p>Standard ACS Popup:</p><p>4111 1111 1111 1111</p>
+                <p>Successful Visa v2.1.0:</p><p>4000 0000 0000 1000</p>
+            </li>
+        </ul>
+    </div>
     <script>
+        async function postData(url = '', data = {}) {
+            // Default options are marked with *
+            const response = await fetch(url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                    'Content-Type': 'application/json'
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: JSON.stringify(data) // body data type must match "Content-Type" header
+            });
+            return response.json(); // parses JSON response into native JavaScript objects
+        }
+    </script>
+    <script>
+        {# Declare DOM variables #}
+        var addedFields = JSON.parse(document.getElementById("vars").dataset.fields.replaceAll('\'', '"'))
+        console.log(addedFields)
         var button = document.getElementById("add_btn")
+        var clear = document.getElementById("clr_btn")
+        var save = document.getElementById("save_btn")
         var name_input = document.getElementById("new_name")
         var value_input = document.getElementById("new_val")
         var form = document.getElementById("ppg_form")
+
+        {# Add saved fields #}
+        for ([f,v] of Object.entries(addedFields)) {
+            var label = document.createElement("span")
+            label.innerHTML = f
+            var new_field = document.createElement("input")
+            new_field.name = f
+            new_field.value = v
+            form.insertBefore(label, document.getElementById("submitbutton"))
+            form.insertBefore(new_field, document.getElementById("submitbutton"))
+            form.insertBefore(document.createElement("br"), document.getElementById("submitbutton"))
+        }
+
+        {# Logic to add/save fields using inputs and buttons #}
         button.addEventListener('click', () => {
             var label = document.createElement("span")
             label.innerHTML = name_input.value
             var new_field = document.createElement("input")
-            console.log(value_input.value)
             new_field.name = name_input.value
             new_field.value = value_input.value
             form.insertBefore(label, document.getElementById("submitbutton"))
             form.insertBefore(new_field, document.getElementById("submitbutton"))
             form.insertBefore(document.createElement("br"), document.getElementById("submitbutton"))
+            addedFields[new_field.name] = new_field.value
             name_input.value = ""
             value_input.value = ""
+            name_input.focus()
+        })
+        save.addEventListener("click", async () => {
+            await postData("http://localhost:3000/savePPG", addedFields)
+        })
+        clear.addEventListener("click", async () => {
+            await postData("http://localhost:3000/clearPPG", {"clear": true})
+            location.reload()
         })
     </script>
-{% endblock %}

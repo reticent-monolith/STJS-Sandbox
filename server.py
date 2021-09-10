@@ -139,7 +139,7 @@ def save():
         "paymenttypedescription": req["paymenttypedescription"]
     })
     store_refs(transaction_refs, "./refs.pickle")
-    return make_response("Saved", 200)
+    return make_response(jsonify({"saved": "true"}), 200)
 
 @app.route("/updatejwt", methods=["POST"])
 def update_jwt():
@@ -153,7 +153,27 @@ def update_jwt():
 # Payment pages
 @app.route("/ppg")
 def ppg():
-    return render_template(f"ppg.jinja", domain=P_DOMAIN, site_ref=SITE_REF)
+    fields = None
+    if os.path.exists("./fields.pickle"):
+        with open("./fields.pickle", 'rb') as fields:
+            fields = pickle.load(fields)
+    else:
+        fields = {}
+    return render_template(f"ppg.jinja", domain=P_DOMAIN, site_ref=SITE_REF, fields=fields)
+
+@app.route("/savePPG", methods=["POST"])
+def savePPG():
+    req = request.get_json()
+    store_refs(req, "fields.pickle")
+    return make_response(jsonify({"saved": "true"}), 200)
+
+@app.route("/clearPPG", methods=["POST"])
+def clearPPG():
+    try:
+        os.remove("./fields.pickle")
+    except:
+        pass
+    return make_response(jsonify({"cleared": "true"}), 200)
 
 # DRIVER CODE
 if __name__=="__main__":
